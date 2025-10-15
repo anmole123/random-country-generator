@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Explorer | Random Country Generator</title>
+    <meta name="description" content="Discover random countries with detailed information about their culture, geography, and national symbols">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <style>
+        /* Custom styles for glassmorphism, animations, etc. */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .country-card {
+            transition: all 0.3s ease;
+        }
+        
+        .country-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        .dark .skeleton {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+        }
+        
+        .social-bar {
+            transition: transform 0.3s ease;
+        }
+        
+        .social-bar:hover {
+            transform: translateX(5px);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        /* Cookie consent styles */
+        .cookie-consent {
+            transform: translateY(100%);
+            transition: transform 0.5s ease;
+        }
+        
+        .cookie-consent.show {
+            transform: translateY(0);
+        }
+        
+        /* FAQ accordion styles */
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+        
+        /* Testimonial slider */
+        .testimonial-slider {
+            scroll-behavior: smooth;
+        }
+        
+        /* Filter drawer */
+        .filter-drawer {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .filter-drawer.open {
+            transform: translateX(0);
+        }
+        
+        /* Favorites drawer */
+        .favorites-drawer {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .favorites-drawer.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm transition-all duration-300">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2.5a7.5 7.5 0 0 0-7.5 7.5c0 2.982 1.814 5.545 4.39 6.626a.75.75 0 0 1-.28 1.459 9 9 0 0 1-5.11-4.585A9 9 0 0 1 10 1a9 9 0 0 1 8.5 11.985 9 9 0 0 1-5.11 4.585.75.75 0 0 1-.28-1.459C8.186 15.545 10 12.982 10 10a7.5 7.5 0 0 0-7.5-7.5zm0 13a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-xl font-bold text-primary-700 dark:text-primary-400">World Explorer</span>
+                </div>
+                
+                <!-- Navigation - Desktop -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                    <a href="#generator" class="flex items-center space-x-1 text-primary-600 dark:text-primary-400 font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Generator</span>
+                    </a>
+                    <a href="#features" class="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Features</span>
+                    </a>
+                    <a href="#testimonials" class="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <span>About</span>
+                    </a>
+                    <a href="#contact" class="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                        <span>Contact</span>
+                    </a>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Mobile Navigation -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col space-y-4 mt-4">
+                    <a href="#" class="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                    <a href="#generator" class="flex items-center space-x-2 text-primary-600 dark:text-primary-400 font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Generator</span>
+                    </a>
+                    <a href="#features" class="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Features</span>
+                    </a>
+                    <a href="#testimonials" class="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <span>About</span>
+                    </a>
+                    <a href="#contact" class="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                        <span>Contact</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-16 md:py-24 bg-gradient-to-r from-primary-500 to-indigo-600 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 animate-fade-in">Discover the World</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto animate-slide-up">Explore random countries with rich details about their culture, geography, and national symbols</p>
+            <button id="generate-btn" class="bg-white text-primary-600 hover:bg-gray-100 font-bold py-4 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center mx-auto animate-pulse-slow">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Generate Random Country
+            </button>
+        </div>
+    </section>
+
+    <!-- Country Result Section -->
+    <section id="generator" class="py-12 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <!-- Result Card -->
+                <div id="result-card" class="hidden bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden country-card glass">
+                    <div class="p-6">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <!-- Flag and Basic Info -->
+                            <div class="md:w-1/3 flex flex-col items-center">
+                                <div id="flag-container" class="w-full h-48 md:h-64 bg-gray-200 dark:bg-gray-700 rounded-xl overflow-hidden flex items-center justify-center mb-4">
+                                    <!-- Flag image will be inserted here -->
+                                </div>
+                                <h2 id="country-name" class="text-2xl font-bold text-center mb-2"></h2>
+                                <p id="country-region" class="text-gray-600 dark:text-gray-400 text-center"></p>
+                            </div>
+                            
+                            <!-- Detailed Info Table -->
+                            <div class="md:w-2/3">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Row 1 -->
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600 dark:text-primary-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Capital</p>
+                                            <p id="country-capital" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 dark:text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Population</p>
+                                            <p id="country-population" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Row 2 -->
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600 dark:text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Area</p>
+                                            <p id="country-area" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600 dark:text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zm3 14a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Density</p>
+                                            <p id="country-density" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Row 3 -->
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 dark:text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.578a18.87 18.87 0 01-1.724 4.78c.29.354.596.696.914 1.026a1 1 0 11-1.44 1.389c-.188-.196-.373-.396-.554-.6a19.098 19.098 0 01-3.107 3.567 1 1 0 01-1.334-1.49 17.087 17.087 0 003.13-3.733 18.992 18.992 0 01-1.487-2.494 1 1 0 111.79-.89c.234.47.489.928.764 1.372.417-.934.752-1.913.997-2.927H3a1 1 0 110-2h3V3a1 1 0 011-1zm6 6a1 1 0 01.894.553l2.991 5.982a.869.869 0 01.02.037l.99 1.98a1 1 0 11-1.79.895L15.383 16h-4.764l-.724 1.447a1 1 0 11-1.788-.894l.99-1.98.019-.038 2.99-5.982A1 1 0 0113 8zm-1.382 6h2.764L13 11.236 11.618 14z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Currency</p>
+                                            <p id="country-currency" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C15.802 8.249 16 9.1 16 10zm-5.165 3.913l1.58 1.58A5.98 5.98 0 0110 16a5.976 5.976 0 01-2.516-.552l1.562-1.562a4.006 4.006 0 001.789.027zm-4.677-2.796a4.002 4.002 0 01-.041-2.08l-.08.08-1.53-1.533A5.98 5.98 0 004 10c0 .954.223 1.856.619 2.657l1.54-1.54zm1.088-6.45A5.974 5.974 0 0110 4c.954 0 1.856.223 2.657.619l-1.54 1.54a4.002 4.002 0 00-2.346.033L7.246 4.668zM12 10a2 2 0 11-4 0 2 2 0 014 0z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Languages</p>
+                                            <p id="country-languages" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Row 4 - National Symbols -->
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600 dark:text-pink-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">National Flower</p>
+                                            <p id="country-flower" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600 dark:text-orange-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">National Dish</p>
+                                            <p id="country-dish" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Row 5 -->
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-600 dark:text-teal-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">National Animal</p>
+                                            <p id="country-animal" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-lime-100 dark:bg-lime-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-lime-600 dark:text-lime-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">National Fruit</p>
+                                            <p id="country-fruit" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Row 6 -->
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 rounded-full bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center mr-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cyan-600 dark:text-cyan-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">National Bird</p>
+                                            <p id="country-bird" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="flex flex-wrap gap-3 mt-6">
+                                    <button id="another-btn" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg flex items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        Another One
+                                    </button>
+                                    <button id="share-btn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg flex items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                        </svg>
+                                        Share
+                                    </button>
+                                    <button id="favorite-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg flex items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                        Add to Favorites
+                                    </button>
+                                    <button id="copy-summary-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg flex items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        Copy Summary
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skeleton Loader -->
+                <div id="skeleton-loader" class="hidden bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <!-- Flag Skeleton -->
+                            <div class="md:w-1/3 flex flex-col items-center">
+                                <div class="w-full h-48 md:h-64 skeleton rounded-xl mb-4"></div>
+                                <div class="h-8 w-3/4 skeleton rounded mb-2"></div>
+                                <div class="h-4 w-1/2 skeleton rounded"></div>
+                            </div>
+                            
+                            <!-- Info Skeleton -->
+                            <div class="md:w-2/3">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- 12 skeleton items -->
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="w-10 h-10 skeleton rounded-full mr-3"></div>
+                                        <div class="flex-1">
+                                            <div class="h-4 w-1/3 skeleton rounded mb-2"></div>
+                                            <div class="h-5 w-2/3 skeleton rounded"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Button Skeletons -->
+                                <div class="flex flex-wrap gap-3 mt-6">
+                                    <div class="h-10 w-32 skeleton rounded-lg"></div>
+                                    <div class="h-10 w-24 skeleton rounded-lg"></div>
+                                    <div class="h-10 w-40 skeleton rounded-lg"></div>
+                                    <div class="h-10 w-36 skeleton rounded-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Initial State -->
+                <div id="initial-state" class="text-center py-12">
+                    <div class="max-w-md mx-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-gray-400 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Ready to Explore?</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-6">Click the "Generate Random Country" button to discover a new country with detailed information about its culture, geography, and national symbols.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Country Showcase Slider -->
+    <section class="py-12 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Featured Countries</h2>
+            
+            <div class="max-w-6xl mx-auto">
+                <div id="country-slider" class="flex overflow-x-auto pb-6 snap-x snap-mandatory testimonial-slider scrollbar-hide">
+                    <!-- Slider items will be populated by JavaScript -->
+                </div>
+                
+                <!-- Slider Navigation -->
+                <div class="flex justify-center mt-6 space-x-2">
+                    <button id="slider-prev" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <button id="slider-next" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Advanced Features</h2>
+            <p class="text-xl text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12">Enhance your country discovery experience with these powerful tools</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Region Picker</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Generate countries from selected regions only. Focus on specific parts of the world.</p>
+                        <button class="text-primary-600 dark:text-primary-400 font-medium hover:underline flex items-center">
+                            Try it now
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Population Slider</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Choose small to huge populations. Find countries that match your population preferences.</p>
+                        <button class="text-primary-600 dark:text-primary-400 font-medium hover:underline flex items-center">
+                            Try it now
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Language Match</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Generate countries by language. Discover nations that speak languages you're interested in.</p>
+                        <button class="text-primary-600 dark:text-primary-400 font-medium hover:underline flex items-center">
+                            Try it now
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Save Favorites</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Store your top discoveries locally. Build a personal collection of favorite countries.</p>
+                        <button class="text-primary-600 dark:text-primary-400 font-medium hover:underline flex items-center">
+                            Try it now
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Compare Mode</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Quick compare two random countries. See side-by-side comparisons of different nations.</p>
+                        <button class="text-primary-600 dark:text-primary-400 font-medium hover:underline flex items-center">
+                            Try it now
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Export / Print</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Create a print/PDF-friendly summary. Save or share country information in a formatted document.</p>
+                        <button class="text-primary-600 dark:text-primary-400 font-medium hover:underline flex items-center">
+                            Try it now
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-16 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">What Users Say</h2>
+            <p class="text-xl text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12">Discover how our Random Country Generator is helping people explore the world</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 shadow-md animate-fade-in">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-lg mr-4">
+                            JS
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">John Smith</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Geography Teacher</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 italic">"This tool has transformed how I teach world geography. My students love discovering random countries and learning about their unique characteristics."</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 shadow-md animate-fade-in" style="animation-delay: 0.1s">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 dark:text-green-400 font-bold text-lg mr-4">
+                            MJ
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Maria Johnson</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Travel Blogger</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 italic">"As a travel blogger, I'm always looking for new destinations. The Random Country Generator helps me discover places I'd never considered visiting before."</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 shadow-md animate-fade-in" style="animation-delay: 0.2s">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold text-lg mr-4">
+                            AS
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Alex Sanchez</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Student</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 italic">"I use this for my cultural studies class. The detailed information about national symbols and demographics is incredibly helpful for my research projects."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-16 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Frequently Asked Questions</h2>
+            <p class="text-xl text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12">Find answers to common questions about the Random Country Generator</p>
+            
+            <div class="max-w-3xl mx-auto">
+                <!-- FAQ 1 -->
+                <div class="faq-item bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-4 overflow-hidden">
+                    <button class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <span class="font-medium text-lg">How are countries chosen?</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="p-6 pt-0 text-gray-600 dark:text-gray-400">
+                            <p>Countries are selected randomly from a comprehensive list of all recognized sovereign states. When online, we fetch the latest data from the REST Countries API. If you're offline or the API is unavailable, we use our embedded dataset with detailed information for each country.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ 2 -->
+                <div class="faq-item bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-4 overflow-hidden">
+                    <button class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <span class="font-medium text-lg">Can I filter by region or language?</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="p-6 pt-0 text-gray-600 dark:text-gray-400">
+                            <p>Yes! Our advanced features include region and language filters. You can specify which regions (like Europe, Asia, Africa) or languages you're interested in, and the generator will only select countries that match your criteria. These options are available in the "Advanced Features" section.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ 3 -->
+                <div class="faq-item bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-4 overflow-hidden">
+                    <button class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <span class="font-medium text-lg">Do you store my favorites?</span>
+                        <svg xmlns="http://www.w3.org2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="p-6 pt-0 text-gray-600 dark:text-gray-400">
+                            <p>Your favorite countries are stored locally in your browser's storage. This means we don't have access to your favorites, and they remain private to you. If you clear your browser data, your favorites will be lost, so we recommend exporting them if you want to keep a permanent record.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ 4 -->
+                <div class="faq-item bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-4 overflow-hidden">
+                    <button class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <span class="font-medium text-lg">What happens offline?</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="p-6 pt-0 text-gray-600 dark:text-gray-400">
+                            <p>The Random Country Generator works completely offline! We include a comprehensive dataset with information for all countries directly in the application. While offline, you won't get live flag images from the API, but all other country details will be available from our embedded dataset.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ 5 -->
+                <div class="faq-item bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-4 overflow-hidden">
+                    <button class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <span class="font-medium text-lg">How to share a country?</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="p-6 pt-0 text-gray-600 dark:text-gray-400">
+                            <p>After generating a country, you'll see a "Share" button. Clicking this will give you options to copy a summary of the country information to your clipboard or use your device's native sharing capabilities to send it via email, social media, or messaging apps. The summary includes key facts about the country in a formatted text.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Keywords Section -->
+    <section class="py-16 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Popular Keywords</h2>
+            <p class="text-xl text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12">Explore related topics and search terms</p>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">random country generator</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">country facts</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">world trivia</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">generate country</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">learn capitals</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">flag quiz</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">travel inspiration</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">country comparison</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">national dishes</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">national animals</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">population facts</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">country languages</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">country regions</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">quick facts</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">country size</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">density calculator</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">favorite countries</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">share country</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">print country card</a>
+                    <a href="#" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm transition-colors text-center">country slider</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Column 1 -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 2.5a7.5 7.5 0 0 0-7.5 7.5c0 2.982 1.814 5.545 4.39 6.626a.75.75 0 0 1-.28 1.459 9 9 0 0 1-5.11-4.585A9 9 0 0 1 10 1a9 9 0 0 1 8.5 11.985 9 9 0 0 1-5.11 4.585.75.75 0 0 1-.28-1.459C8.186 15.545 10 12.982 10 10a7.5 7.5 0 0 0-7.5-7.5zm0 13a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-xl font-bold text-primary-400">World Explorer</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Discover the world one country at a time with our random country generator and detailed country information.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12.02 2.091c-5.502 0-9.969 4.467-9.969 9.969 0 5.502 4.467 9.969 9.969 9.969 5.502 0 9.969-4.467 9.969-9.969 0-5.502-4.467-9.969-9.969-9.969zm5.191 8.066h-4.281v8.5h-1.75v-8.5h-2.5v-1.406h8.531v1.406zm-4.281-6.656c0 .594.51 1.094 1.125 1.094.615 0 1.125-.5 1.125-1.094s-.51-1.094-1.125-1.094c-.615 0-1.125.5-1.125 1.094z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Column 2 -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#generator" class="text-gray-400 hover:text-white transition-colors">Country Generator</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#testimonials" class="text-gray-400 hover:text-white transition-colors">Testimonials</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3 -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Country Database</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Educational Resources</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Travel Guides</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4 -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Disclaimer</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 World Explorer. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Sticky Social Bar -->
+    <div class="fixed left-0 top-1/2 transform -translate-y-1/2 z-40 social-bar">
+        <div class="flex flex-col space-y-2 bg-white dark:bg-gray-800 shadow-lg rounded-r-lg py-3 px-2">
+            <a href="#" class="p-2 text-blue-600 hover:text-blue-800 transition-colors" aria-label="Twitter">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                </svg>
+            </a>
+            <a href="#" class="p-2 text-blue-800 hover:text-blue-900 transition-colors" aria-label="Facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+                </svg>
+            </a>
+            <a href="#" class="p-2 text-blue-700 hover:text-blue-900 transition-colors" aria-label="LinkedIn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+            </a>
+            <a href="#" class="p-2 text-green-600 hover:text-green-800 transition-colors" aria-label="WhatsApp">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.02 2.091c-5.502 0-9.969 4.467-9.969 9.969 0 5.502 4.467 9.969 9.969 9.969 5.502 0 9.969-4.467 9.969-9.969 0-5.502-4.467-9.969-9.969-9.969zm5.191 8.066h-4.281v8.5h-1.75v-8.5h-2.5v-1.406h8.531v1.406zm-4.281-6.656c0 .594.51 1.094 1.125 1.094.615 0 1.125-.5 1.125-1.094s-.51-1.094-1.125-1.094c-.615 0-1.125.5-1.125 1.094z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- Cookie Consent -->
+    <div id="cookie-consent" class="cookie-consent fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 shadow-lg z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-4 md:mb-0 md:mr-4">
+                    <p class="text-sm">We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.</p>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="cookie-manage" class="text-sm bg-gray-700 hover:bg-gray-600 py-2 px-4 rounded transition-colors">Manage Preferences</button>
+                    <button id="cookie-accept" class="text-sm bg-primary-600 hover:bg-primary-700 py-2 px-4 rounded transition-colors">Accept All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-800 shadow-xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Settings</h2>
+                <button id="close-settings" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Theme Toggle -->
+                <div>
+                    <h3 class="text-lg font-medium mb-3">Theme</h3>
+                    <div class="flex space-x-4">
+                        <button id="theme-light" class="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            Light
+                        </button>
+                        <button id="theme-dark" class="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            Dark
+                        </button>
+                        <button id="theme-auto" class="flex-1 py-2 px-4 border border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg text-center">
+                            Auto
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Animations Toggle -->
+                <div>
+                    <h3 class="text-lg font-medium mb-3">Animations</h3>
+                    <div class="flex items-center justify-between">
+                        <span>Enable animations</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="animations-toggle" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Region Filter -->
+                <div>
+                    <h3 class="text-lg font-medium mb-3">Region Filter</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="region-filter rounded text-primary-600 focus:ring-primary-500" value="Africa">
+                            <span class="ml-2">Africa</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="region-filter rounded text-primary-600 focus:ring-primary-500" value="Americas">
+                            <span class="ml-2">Americas</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="region-filter rounded text-primary-600 focus:ring-primary-500" value="Asia">
+                            <span class="ml-2">Asia</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="region-filter rounded text-primary-600 focus:ring-primary-500" value="Europe">
+                            <span class="ml-2">Europe</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="region-filter rounded text-primary-600 focus:ring-primary-500" value="Oceania">
+                            <span class="ml-2">Oceania</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Language Filter -->
+                <div>
+                    <h3 class="text-lg font-medium mb-3">Language Filter</h3>
+                    <select id="language-filter" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="">All Languages</option>
+                        <option value="English">English</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Arabic">Arabic</option>
+                        <option value="Portuguese">Portuguese</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Japanese">Japanese</option>
+                    </select>
+                </div>
+                
+                <!-- Population Range -->
+                <div>
+                    <h3 class="text-lg font-medium mb-3">Population Range</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="population-min" class="block text-sm mb-1">Min Population</label>
+                            <input type="range" id="population-min" min="0" max="1400000000" step="1000000" value="0" class="w-full">
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>0</span>
+                                <span id="population-min-value">0</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="population-max" class="block text-sm mb-1">Max Population</label>
+                            <input type="range" id="population-max" min="1000000" max="1500000000" step="1000000" value="1500000000" class="w-full">
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span id="population-max-value">1.5B</span>
+                                <span>1.5B+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button id="apply-filters" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg transition-colors">
+                        Apply Filters
+                    </button>
+                    <button id="reset-filters" class="w-full mt-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 py-2 px-4 rounded-lg transition-colors">
+                        Reset All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Button -->
+    <button id="open-settings" class="fixed bottom-6 right-6 bg-primary-600 hover:bg-primary-700 text-white p-3 rounded-full shadow-lg z-40 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+    </button>
+
+    <!-- JavaScript -->
+    <script>
+        // Country data (offline fallback)
+        const countryData = [
+            {
+                "name": "Portugal",
+                "flag": "https://flagcdn.com/pt.svg",
+                "region": "Europe",
+                "capital": "Lisbon",
+                "population": 10305564,
+                "area": 92212,
+                "languages": ["Portuguese"],
+                "currency": {"code":"EUR","name":"Euro","symbol":"€"},
+                "national_flower":"Lavender",
+                "national_dish":"Bacalhau à Brás",
+                "national_animal":"Iberian Wolf",
+                "national_fruit":"Orange",
+                "national_bird":"European Robin"
+            },
+            {
+                "name": "Japan",
+                "flag": "https://flagcdn.com/jp.svg",
+                "region": "Asia",
+                "capital": "Tokyo",
+                "population": 125836021,
+                "area": 377975,
+                "languages": ["Japanese"],
+                "currency": {"code":"JPY","name":"Yen","symbol":"¥"},
+                "national_flower":"Cherry Blossom",
+                "national_dish":"Sushi",
+                "national_animal":"Green Pheasant",
+                "national_fruit":"Persimmon",
+                "national_bird":"Green Pheasant"
+            },
+            {
+                "name": "Brazil",
+                "flag": "https://flagcdn.com/br.svg",
+                "region": "Americas",
+                "capital": "Brasília",
+                "population": 212559409,
+                "area": 8515767,
+                "languages": ["Portuguese"],
+                "currency": {"code":"BRL","name":"Real","symbol":"R$"},
+                "national_flower":"Golden Trumpet Tree",
+                "national_dish":"Feijoada",
+                "national_animal":"Jaguar",
+                "national_fruit":"Cupuaçu",
+                "national_bird":"Rufous-bellied Thrush"
+            },
+            {
+                "name": "Egypt",
+                "flag": "https://flagcdn.com/eg.svg",
+                "region": "Africa",
+                "capital": "Cairo",
+                "population": 102334403,
+                "area": 1002450,
+                "languages": ["Arabic"],
+                "currency": {"code":"EGP","name":"Pound","symbol":"£"},
+                "national_flower":"Egyptian Lotus",
+                "national_dish":"Koshary",
+                "national_animal":"Steppe Eagle",
+                "national_fruit":"Date",
+                "national_bird":"Steppe Eagle"
+            },
+            {
+                "name": "Australia",
+                "flag": "https://flagcdn.com/au.svg",
+                "region": "Oceania",
+                "capital": "Canberra",
+                "population": 25687041,
+                "area": 7692024,
+                "languages": ["English"],
+                "currency": {"code":"AUD","name":"Dollar","symbol":"$"},
+                "national_flower":"Golden Wattle",
+                "national_dish":"Meat Pie",
+                "national_animal":"Kangaroo",
+                "national_fruit":"Riberry",
+                "national_bird":"Emu"
+            }
+        ];
+
+        // DOM Elements
+        const generateBtn = document.getElementById('generate-btn');
+        const anotherBtn = document.getElementById('another-btn');
+        const shareBtn = document.getElementById('share-btn');
+        const favoriteBtn = document.getElementById('favorite-btn');
+        const copySummaryBtn = document.getElementById('copy-summary-btn');
+        const resultCard = document.getElementById('result-card');
+        const skeletonLoader = document.getElementById('skeleton-loader');
+        const initialState = document.getElementById('initial-state');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const cookieConsent = document.getElementById('cookie-consent');
+        const cookieAccept = document.getElementById('cookie-accept');
+        const cookieManage = document.getElementById('cookie-manage');
+        const settingsPanel = document.getElementById('settings-panel');
+        const openSettings = document.getElementById('open-settings');
+        const closeSettings = document.getElementById('close-settings');
+        const themeLight = document.getElementById('theme-light');
+        const themeDark = document.getElementById('theme-dark');
+        const themeAuto = document.getElementById('theme-auto');
+        const animationsToggle = document.getElementById('animations-toggle');
+        const applyFilters = document.getElementById('apply-filters');
+        const resetFilters = document.getElementById('reset-filters');
+        const countrySlider = document.getElementById('country-slider');
+        const sliderPrev = document.getElementById('slider-prev');
+        const sliderNext = document.getElementById('slider-next');
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        // App State
+        let currentCountry = null;
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        let filters = {
+            regions: [],
+            languages: [],
+            population: { min: 0, max: 1500000000 }
+        };
+
+        // Initialize the app
+        function init() {
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+                updateThemeButtons(savedTheme);
+            } else {
+                // Default to auto (system preference)
+                updateThemeButtons('auto');
+            }
+
+            // Check for saved animations preference
+            const savedAnimations = localStorage.getItem('animations');
+            if (savedAnimations !== null) {
+                animationsToggle.checked = savedAnimations === 'true';
+                toggleAnimations(animationsToggle.checked);
+            }
+
+            // Check cookie consent
+            const cookieAccepted = localStorage.getItem('cookieConsent');
+            if (!cookieAccepted) {
+                setTimeout(() => {
+                    cookieConsent.classList.add('show');
+                }, 1000);
+            }
+
+            // Initialize country slider
+            initCountrySlider();
+
+            // Initialize FAQ accordions
+            initFAQs();
+
+            // Initialize event listeners
+            initEventListeners();
+
+            // Update population range values
+            updatePopulationRangeValues();
+        }
+
+        // Initialize event listeners
+        function initEventListeners() {
+            generateBtn.addEventListener('click', generateRandomCountry);
+            anotherBtn.addEventListener('click', generateRandomCountry);
+            shareBtn.addEventListener('click', shareCountry);
+            favoriteBtn.addEventListener('click', toggleFavorite);
+            copySummaryBtn.addEventListener('click', copySummary);
+            
+            mobileMenuButton.addEventListener('click', toggleMobileMenu);
+            
+            cookieAccept.addEventListener('click', acceptCookies);
+            cookieManage.addEventListener('click', manageCookies);
+            
+            openSettings.addEventListener('click', openSettingsPanel);
+            closeSettings.addEventListener('click', closeSettingsPanel);
+            
+            themeLight.addEventListener('click', () => setTheme('light'));
+            themeDark.addEventListener('click', () => setTheme('dark'));
+            themeAuto.addEventListener('click', () => setTheme('auto'));
+            
+            animationsToggle.addEventListener('change', (e) => {
+                toggleAnimations(e.target.checked);
+                localStorage.setItem('animations', e.target.checked);
+            });
+            
+            applyFilters.addEventListener('click', applyCountryFilters);
+            resetFilters.addEventListener('click', resetCountryFilters);
+            
+            sliderPrev.addEventListener('click', slidePrev);
+            sliderNext.addEventListener('click', slideNext);
+            
+            // Population range inputs
+            document.getElementById('population-min').addEventListener('input', updatePopulationRangeValues);
+            document.getElementById('population-max').addEventListener('input', updatePopulationRangeValues);
+            
+            // Region filter checkboxes
+            document.querySelectorAll('.region-filter').forEach(checkbox => {
+                checkbox.addEventListener('change', updateRegionFilters);
+            });
+            
+            // Language filter select
+            document.getElementById('language-filter').addEventListener('change', updateLanguageFilter);
+        }
+
+        // Initialize country slider
+        function initCountrySlider() {
+            countryData.forEach(country => {
+                const slide = document.createElement('div');
+                slide.className = 'flex-none w-80 snap-center';
+                slide.innerHTML = `
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mx-2 h-full">
+                        <div class="h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                            <img src="${country.flag}" alt="${country.name} flag" class="h-24 object-contain">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-xl font-bold mb-2">${country.name}</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-1"><span class="font-medium">Capital:</span> ${country.capital}</p>
+                            <p class="text-gray-600 dark:text-gray-400 mb-1"><span class="font-medium">Population:</span> ${formatNumber(country.population)}</p>
+                            <p class="text-gray-600 dark:text-gray-400"><span class="font-medium">Region:</span> ${country.region}</p>
+                        </div>
+                    </div>
+                `;
+                countrySlider.appendChild(slide);
+            });
+        }
+
+        // Initialize FAQ accordions
+        function initFAQs() {
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    // Close all other FAQs
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current FAQ
+                    item.classList.toggle('active');
+                });
+            });
+        }
+
+        // Generate a random country
+        async function generateRandomCountry() {
+            // Show skeleton loader
+            skeletonLoader.classList.remove('hidden');
+            resultCard.classList.add('hidden');
+            initialState.classList.add('hidden');
+            
+            // Simulate loading delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            try {
+                // Try to fetch from API first
+                const response = await fetch('https://restcountries.com/v3.1/all');
+                if (response.ok) {
+                    const countries = await response.json();
+                    // Filter countries based on active filters
+                    const filteredCountries = filterCountries(countries);
+                    if (filteredCountries.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * filteredCountries.length);
+                        const apiCountry = filteredCountries[randomIndex];
+                        currentCountry = transformApiCountry(apiCountry);
+                    } else {
+                        // If no countries match filters, use fallback
+                        const randomIndex = Math.floor(Math.random() * countryData.length);
+                        currentCountry = countryData[randomIndex];
+                    }
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                // Use fallback data if API fails
+                console.log('Using fallback data:', error);
+                const filteredCountries = filterCountries(countryData);
+                if (filteredCountries.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * filteredCountries.length);
+                    currentCountry = filteredCountries[randomIndex];
+                } else {
+                    const randomIndex = Math.floor(Math.random() * countryData.length);
+                    currentCountry = countryData[randomIndex];
+                }
+            }
+            
+            // Display the country
+            displayCountry(currentCountry);
+            
+            // Hide skeleton loader and show result card
+            skeletonLoader.classList.add('hidden');
+            resultCard.classList.remove('hidden');
+            
+            // Add confetti effect if animations are enabled
+            if (animationsToggle.checked) {
+                createConfetti();
+            }
+        }
+
+        // Filter countries based on active filters
+        function filterCountries(countries) {
+            return countries.filter(country => {
+                // Region filter
+                if (filters.regions.length > 0 && !filters.regions.includes(country.region)) {
+                    return false;
+                }
+                
+                // Language filter
+                if (filters.languages.length > 0) {
+                    const countryLanguages = Object.values(country.languages || {});
+                    const hasMatchingLanguage = filters.languages.some(lang => 
+                        countryLanguages.includes(lang)
+                    );
+                    if (!hasMatchingLanguage) {
+                        return false;
+                    }
+                }
+                
+                // Population filter
+                if (country.population < filters.population.min || country.population > filters.population.max) {
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+
+        // Transform API country data to our format
+        function transformApiCountry(apiCountry) {
+            // This is a simplified transformation - in a real app you'd want more robust handling
+            const languages = apiCountry.languages ? Object.values(apiCountry.languages) : ['Unknown'];
+            const currency = apiCountry.currencies ? Object.values(apiCountry.currencies)[0] : { code: 'N/A', name: 'Unknown', symbol: '' };
+            
+            // For national symbols, we'd need additional data sources
+            // For now, we'll use placeholder values or try to match with our fallback data
+            const fallbackCountry = countryData.find(c => c.name === apiCountry.name.common) || {};
+            
+            return {
+                name: apiCountry.name.common,
+                flag: apiCountry.flags.svg,
+                region: apiCountry.region,
+                capital: apiCountry.capital ? apiCountry.capital[0] : 'N/A',
+                population: apiCountry.population,
+                area: apiCountry.area,
+                languages: languages,
+                currency: currency,
+                national_flower: fallbackCountry.national_flower || 'Unknown',
+                national_dish: fallbackCountry.national_dish || 'Unknown',
+                national_animal: fallbackCountry.national_animal || 'Unknown',
+                national_fruit: fallbackCountry.national_fruit || 'Unknown',
+                national_bird: fallbackCountry.national_bird || 'Unknown'
+            };
+        }
+
+        // Display country data in the UI
+        function displayCountry(country) {
+            document.getElementById('country-name').textContent = country.name;
+            document.getElementById('country-region').textContent = country.region;
+            document.getElementById('country-capital').textContent = country.capital;
+            document.getElementById('country-population').textContent = formatNumber(country.population);
+            document.getElementById('country-area').textContent = `${formatNumber(country.area)} km²`;
+            document.getElementById('country-density').textContent = `${formatNumber(Math.round(country.population / country.area))} people/km²`;
+            document.getElementById('country-currency').textContent = `${country.currency.symbol} ${country.currency.name} (${country.currency.code})`;
+            document.getElementById('country-languages').textContent = country.languages.join(', ');
+            document.getElementById('country-flower').textContent = country.national_flower;
+            document.getElementById('country-dish').textContent = country.national_dish;
+            document.getElementById('country-animal').textContent = country.national_animal;
+            document.getElementById('country-fruit').textContent = country.national_fruit;
+            document.getElementById('country-bird').textContent = country.national_bird;
+            
+            // Update flag image
+            const flagContainer = document.getElementById('flag-container');
+            flagContainer.innerHTML = '';
+            const flagImg = document.createElement('img');
+            flagImg.src = country.flag;
+            flagImg.alt = `${country.name} flag`;
+            flagImg.className = 'w-full h-full object-contain';
+            flagContainer.appendChild(flagImg);
+            
+            // Update favorite button state
+            updateFavoriteButton();
+        }
+
+        // Format numbers with commas
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+
+        // Share country information
+        function shareCountry() {
+            if (!currentCountry) return;
+            
+            const summary = `Check out ${currentCountry.name}!
+- Capital: ${currentCountry.capital}
+- Population: ${formatNumber(currentCountry.population)}
+- Area: ${formatNumber(currentCountry.area)} km²
+- Region: ${currentCountry.region}
+- Currency: ${currentCountry.currency.name} (${currentCountry.currency.code})
+- Languages: ${currentCountry.languages.join(', ')}
+            
+Discover more at World Explorer!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `${currentCountry.name} - Country Facts`,
+                    text: summary,
+                    url: window.location.href
+                }).catch(err => {
+                    console.log('Error sharing:', err);
+                    copyToClipboard(summary);
+                });
+            } else {
+                copyToClipboard(summary);
+            }
+        }
+
+        // Copy summary to clipboard
+        function copySummary() {
+            if (!currentCountry) return;
+            
+            const summary = `Country: ${currentCountry.name}
+Capital: ${currentCountry.capital}
+Region: ${currentCountry.region}
+Population: ${formatNumber(currentCountry.population)}
+Area: ${formatNumber(currentCountry.area)} km²
+Population Density: ${formatNumber(Math.round(currentCountry.population / currentCountry.area))} people/km²
+Currency: ${currentCountry.currency.symbol} ${currentCountry.currency.name} (${currentCountry.currency.code})
+Languages: ${currentCountry.languages.join(', ')}
+National Flower: ${currentCountry.national_flower}
+National Dish: ${currentCountry.national_dish}
+National Animal: ${currentCountry.national_animal}
+National Fruit: ${currentCountry.national_fruit}
+National Bird: ${currentCountry.national_bird}`;
+            
+            copyToClipboard(summary);
+        }
+
+        // Copy text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show success message
+                const originalText = copySummaryBtn.innerHTML;
+                copySummaryBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Copied!
+                `;
+                setTimeout(() => {
+                    copySummaryBtn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // Toggle favorite status
+        function toggleFavorite() {
+            if (!currentCountry) return;
+            
+            const index = favorites.findIndex(fav => fav.name === currentCountry.name);
+            
+            if (index === -1) {
+                // Add to favorites
+                favorites.push(currentCountry);
+                updateFavoriteButton(true);
+            } else {
+                // Remove from favorites
+                favorites.splice(index, 1);
+                updateFavoriteButton(false);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+        }
+
+        // Update favorite button state
+        function updateFavoriteButton(isFavorite = null) {
+            if (!currentCountry) return;
+            
+            if (isFavorite === null) {
+                isFavorite = favorites.some(fav => fav.name === currentCountry.name);
+            }
+            
+            if (isFavorite) {
+                favoriteBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                    </svg>
+                    Remove from Favorites
+                `;
+                favoriteBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+                favoriteBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+            } else {
+                favoriteBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    Add to Favorites
+                `;
+                favoriteBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                favoriteBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+            }
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Accept cookies
+        function acceptCookies() {
+            localStorage.setItem('cookieConsent', 'true');
+            cookieConsent.classList.remove('show');
+        }
+
+        // Manage cookies (placeholder)
+        function manageCookies() {
+            alert('Cookie management options would be implemented here.');
+        }
+
+        // Open settings panel
+        function openSettingsPanel() {
+            settingsPanel.classList.remove('translate-x-full');
+        }
+
+        // Close settings panel
+        function closeSettingsPanel() {
+            settingsPanel.classList.add('translate-x-full');
+        }
+
+        // Set theme
+        function setTheme(theme) {
+            if (theme === 'auto') {
+                // Remove any manually set theme and use system preference
+                localStorage.removeItem('theme');
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } else {
+                localStorage.setItem('theme', theme);
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+            }
+            
+            updateThemeButtons(theme);
+        }
+
+        // Update theme buttons
+        function updateThemeButtons(theme) {
+            // Reset all buttons
+            themeLight.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            themeDark.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            themeAuto.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            
+            // Add default styles
+            themeLight.classList.add('border-gray-300', 'dark:border-gray-600');
+            themeDark.classList.add('border-gray-300', 'dark:border-gray-600');
+            themeAuto.classList.add('border-gray-300', 'dark:border-gray-600');
+            
+            // Set active button
+            if (theme === 'light') {
+                themeLight.classList.remove('border-gray-300', 'dark:border-gray-600');
+                themeLight.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            } else if (theme === 'dark') {
+                themeDark.classList.remove('border-gray-300', 'dark:border-gray-600');
+                themeDark.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            } else {
+                themeAuto.classList.remove('border-gray-300', 'dark:border-gray-600');
+                themeAuto.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            }
+        }
+
+        // Toggle animations
+        function toggleAnimations(enabled) {
+            if (enabled) {
+                document.body.classList.remove('no-animations');
+            } else {
+                document.body.classList.add('no-animations');
+            }
+        }
+
+        // Update region filters
+        function updateRegionFilters() {
+            filters.regions = Array.from(document.querySelectorAll('.region-filter:checked'))
+                .map(checkbox => checkbox.value);
+        }
+
+        // Update language filter
+        function updateLanguageFilter() {
+            const select = document.getElementById('language-filter');
+            filters.languages = select.value ? [select.value] : [];
+        }
+
+        // Update population range values
+        function updatePopulationRangeValues() {
+            const minInput = document.getElementById('population-min');
+            const maxInput = document.getElementById('population-max');
+            const minValue = document.getElementById('population-min-value');
+            const maxValue = document.getElementById('population-max-value');
+            
+            const min = parseInt(minInput.value);
+            const max = parseInt(maxInput.value);
+            
+            // Ensure min is not greater than max
+            if (min > max) {
+                minInput.value = max;
+                minValue.textContent = formatNumber(max);
+            } else {
+                minValue.textContent = formatNumber(min);
+            }
+            
+            // Ensure max is not less than min
+            if (max < min) {
+                maxInput.value = min;
+                maxValue.textContent = formatNumber(min);
+            } else {
+                maxValue.textContent = formatNumber(max);
+            }
+            
+            // Update filters
+            filters.population.min = parseInt(minInput.value);
+            filters.population.max = parseInt(maxInput.value);
+        }
+
+        // Apply country filters
+        function applyCountryFilters() {
+            closeSettingsPanel();
+            // Filters are already updated via event listeners
+            // We could show a notification that filters are applied
+        }
+
+        // Reset country filters
+        function resetCountryFilters() {
+            // Reset region filters
+            document.querySelectorAll('.region-filter').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            filters.regions = [];
+            
+            // Reset language filter
+            document.getElementById('language-filter').value = '';
+            filters.languages = [];
+            
+            // Reset population range
+            document.getElementById('population-min').value = 0;
+            document.getElementById('population-max').value = 1500000000;
+            updatePopulationRangeValues();
+        }
+
+        // Slide to previous country in slider
+        function slidePrev() {
+            countrySlider.scrollBy({
+                left: -320,
+                behavior: 'smooth'
+            });
+        }
+
+        // Slide to next country in slider
+        function slideNext() {
+            countrySlider.scrollBy({
+                left: 320,
+                behavior: 'smooth'
+            });
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(confetti);
+                
+                // Animate confetti
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: 1000 + Math.random() * 2000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+                });
+                
+                // Remove confetti after animation
+                animation.onfinish = () => {
+                    confetti.remove();
+                };
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
